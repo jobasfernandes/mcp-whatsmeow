@@ -1,0 +1,91 @@
+name: Update WhatsMeow Submodule
+
+on:
+  schedule:
+    - cron: "0 6 * * *"
+
+  workflow_dispatch:
+
+  push:
+    paths:
+      - ".github/workflows/update-whatsmeow.yml"
+
+permissions:
+  contents: write
+
+jobs:
+  update-submodule:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          submodules: true
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Configure Git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Get current submodule commit
+        id: current
+        run: |
+          cd whatsmeow
+          echo "sha=$(git rev-parse HEAD)" >> $GITHUB_OUTPUT
+          echo "short_sha=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
+
+      - name: Update submodule to latest
+        run: |
+          git submodule update --remote --merge whatsmeow
+
+      - name: Get new submodule commit
+        id: new
+        run: |
+          cd whatsmeow
+          echo "sha=$(git rev-parse HEAD)" >> $GITHUB_OUTPUT
+          echo "short_sha=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
+          echo "message=$(git log -1 --pretty=%s)" >> $GITHUB_OUTPUT
+
+      - name: Check for changes
+        id: changes
+        run: |
+          if [ "${{ steps.current.outputs.sha }}" != "${{ steps.new.outputs.sha }}" ]; then
+            echo "has_changes=true" >> $GITHUB_OUTPUT
+            echo "📦 Submodule updated from ${{ steps.current.outputs.short_sha }} to ${{ steps.new.outputs.short_sha }}"
+          else
+            echo "has_changes=false" >> $GITHUB_OUTPUT
+            echo "✅ Submodule already up to date"
+          fi
+
+      - name: Commit and push changes
+        if: steps.changes.outputs.has_changes == 'true'
+        run: |
+          git add whatsmeow
+          git commit -m "chore(deps): update whatsmeow submodule to ${{ steps.new.outputs.short_sha }}
+
+          Latest commit: ${{ steps.new.outputs.message }}
+
+          Updated automatically by GitHub Actions"
+          git push
+
+      - name: Summary
+        run: |
+          echo "## 🔄 WhatsMeow Submodule Update" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          if [ "${{ steps.changes.outputs.has_changes }}" == "true" ]; then
+            echo "✅ **Updated successfully!**" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "| | Commit |" >> $GITHUB_STEP_SUMMARY
+            echo "|---|---|" >> $GITHUB_STEP_SUMMARY
+            echo "| Previous | \`${{ steps.current.outputs.short_sha }}\` |" >> $GITHUB_STEP_SUMMARY
+            echo "| Current | \`${{ steps.new.outputs.short_sha }}\` |" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "**Latest commit:** ${{ steps.new.outputs.message }}" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "ℹ️ **No updates available**" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "Current commit: \`${{ steps.current.outputs.short_sha }}\`" >> $GITHUB_STEP_SUMMARY
+          fi

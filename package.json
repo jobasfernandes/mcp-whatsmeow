@@ -1,0 +1,49 @@
+{
+  "name": "mcp-whatsmeow",
+  "version": "1.0.0",
+  "description": "MCP Server para contexto da biblioteca WhatsMeow (Go) - tipos, funções, métodos, constantes, busca semântica e exploração de módulos.",
+  "type": "module",
+  "main": "dist/index.js",
+  "bin": {
+    "mcp-whatsmeow": "dist/index.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "dev": "tsc --watch",
+    "prepublishOnly": "npm run build"
+  },
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "keywords": [
+    "mcp",
+    "model-context-protocol",
+    "whatsmeow",
+    "whatsapp",
+    "go",
+    "ai",
+    "copilot"
+  ],
+  "author": "Joseph",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jobasfernandes/mcp-whatsmeow.git"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.26.0",
+    "zod": "^4.1.13"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "typescript": "^5.7.2"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}
