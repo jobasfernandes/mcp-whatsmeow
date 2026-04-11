@@ -1,7 +1,7 @@
 {
   "name": "mcp-whatsmeow",
-  "version": "1.0.0",
-  "description": "MCP Server para contexto da biblioteca WhatsMeow (Go) - tipos, funções, métodos, constantes, busca semântica e exploração de módulos.",
+  "version": "2.0.0",
+  "description": "MCP Server para contexto completo da biblioteca WhatsMeow (Go/WhatsApp) - 38 tools com AST parsing, domain knowledge, waE2E protobuf browser, guias de referência e exemplos de produção.",
   "type": "module",
   "main": "dist/index.js",
   "bin": {
@@ -24,7 +24,11 @@
     "whatsapp",
     "go",
     "ai",
-    "copilot"
+    "copilot",
+    "domain-knowledge",
+    "wae2e",
+    "protobuf",
+    "production-examples"
   ],
   "author": "Joseph",
   "license": "MIT",
